@@ -134,7 +134,7 @@ const Carousel = React.createClass({
     });
     this.setDimensions(nextProps);
     if (nextProps.slideIndex !== this.state.currentSlide) {
-      this.goToSlide(nextProps.slideIndex);
+      this.goToSlide(nextProps.slideIndex, nextProps);
     }
   },
 
@@ -383,21 +383,27 @@ const Carousel = React.createClass({
 
   // Action Methods
 
-  goToSlide(index) {
+  goToSlide(index, nextProps) {
     var self = this;
+    var props;
+    if(nextProps){
+      props = nextProps;
+    } else {
+      props = this.props;
+    }
 
-    if (index >= React.Children.count(this.props.children) || index < 0) {
-      if (this.props.invalidChange) {
-        this.props.invalidChange(index);
+    if (index >= React.Children.count(props.children) || index < 0) {
+      if (props.invalidChange) {
+        props.invalidChange(index);
       }
     } else {
-      this.props.beforeSlide(this.state.currentSlide, index);
+      props.beforeSlide(this.state.currentSlide, index);
 
       this.setState({
         currentSlide: index
       }, function() {
         self.animateSlide();
-        this.props.afterSlide(index);
+        props.afterSlide(index);
         self.setExternalData();
       });
     }
