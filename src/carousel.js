@@ -406,18 +406,22 @@ const Carousel = React.createClass({
   nextSlide() {
     var childrenCount = React.Children.count(this.props.children);
     if (this.state.currentSlide >= childrenCount - this.props.slidesToShow) {
-      return;
+      if (this.props.invalidChange) {
+        this.props.invalidChange(this.state.currentSlide);
+      }
+    } else {
+      this.goToSlide(Math.min(this.state.currentSlide + this.state.slidesToScroll, childrenCount - this.props.slidesToShow));
     }
-
-    this.goToSlide(Math.min(this.state.currentSlide + this.state.slidesToScroll, childrenCount - this.props.slidesToShow));
   },
 
   previousSlide() {
     if (this.state.currentSlide <= 0) {
-      return;
+      if (this.props.invalidChange) {
+        this.props.invalidChange(this.state.currentSlide);
+      }
+    }else{
+      this.goToSlide(Math.max(0, this.state.currentSlide - this.state.slidesToScroll));
     }
-
-    this.goToSlide(Math.max(0, this.state.currentSlide - this.state.slidesToScroll));
   },
 
   // Animation
