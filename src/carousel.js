@@ -41,6 +41,7 @@ const Carousel = React.createClass({
   propTypes: {
     afterSlide: React.PropTypes.func,
     beforeSlide: React.PropTypes.func,
+    invalidChange: React.PropTypes.func,
     cellAlign: React.PropTypes.oneOf(['left', 'center', 'right']),
     cellSpacing: React.PropTypes.number,
     data: React.PropTypes.func,
@@ -384,19 +385,22 @@ const Carousel = React.createClass({
 
   goToSlide(index) {
     var self = this;
+
     if (index >= React.Children.count(this.props.children) || index < 0) {
-      return;
+      if (this.props.invalidChange) {
+        this.props.invalidChange(index);
+      }
+    } else {
+      this.props.beforeSlide(this.state.currentSlide, index);
+
+      this.setState({
+        currentSlide: index
+      }, function() {
+        self.animateSlide();
+        this.props.afterSlide(index);
+        self.setExternalData();
+      });
     }
-
-    this.props.beforeSlide(this.state.currentSlide, index);
-
-    this.setState({
-      currentSlide: index
-    }, function() {
-      self.animateSlide();
-      this.props.afterSlide(index);
-      self.setExternalData();
-    });
   },
 
   nextSlide() {
