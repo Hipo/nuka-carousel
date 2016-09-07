@@ -328,12 +328,18 @@ const Carousel = React.createClass({
       if (this.touchObject.direction === 1) {
         if (this.state.currentSlide >= React.Children.count(this.props.children) - this.props.slidesToShow) {
           this.animateSlide(tweenState.easingTypes[this.props.edgeEasing]);
+          if(this.props.invalidChange){
+            this.props.invalidChange(this.state.currentSlide, true);
+          }
         } else {
           this.nextSlide();
         }
       } else if (this.touchObject.direction === -1) {
         if (this.state.currentSlide <= 0) {
           this.animateSlide(tweenState.easingTypes[this.props.edgeEasing]);
+          if(this.props.invalidChange){
+            this.props.invalidChange(this.state.currentSlide, false);
+          }
         } else {
           this.previousSlide();
         }
@@ -392,9 +398,12 @@ const Carousel = React.createClass({
       props = this.props;
     }
 
-    if (index >= React.Children.count(props.children) || index < 0) {
+    var isLastNext = index >= React.Children.count(props.children);
+    var isLastPrev =  index < 0;
+
+    if (isLastPrev || isLastNext) {
       if (props.invalidChange) {
-        props.invalidChange(index);
+        props.invalidChange(index, isLastNext);
       }
     } else {
       props.beforeSlide(this.state.currentSlide, index);
@@ -413,7 +422,7 @@ const Carousel = React.createClass({
     var childrenCount = React.Children.count(this.props.children);
     if (this.state.currentSlide >= childrenCount - this.props.slidesToShow) {
       if (this.props.invalidChange) {
-        this.props.invalidChange(this.state.currentSlide);
+        this.props.invalidChange(this.state.currentSlide, true);
       }
     } else {
       this.goToSlide(Math.min(this.state.currentSlide + this.state.slidesToScroll, childrenCount - this.props.slidesToShow));
@@ -423,7 +432,7 @@ const Carousel = React.createClass({
   previousSlide() {
     if (this.state.currentSlide <= 0) {
       if (this.props.invalidChange) {
-        this.props.invalidChange(this.state.currentSlide);
+        this.props.invalidChange(this.state.currentSlide, false);
       }
     }else{
       this.goToSlide(Math.max(0, this.state.currentSlide - this.state.slidesToScroll));
